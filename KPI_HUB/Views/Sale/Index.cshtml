@@ -1,0 +1,72 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.SaleListViewModel>
+@{
+    ViewData["Title"] = "Sales & Orders";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Sales & Customer Orders</h4>
+        <p class="text-muted mb-0">Record and track multi-item sales transactions and invoices</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-cart-plus me-1"></i> Record New Sale
+    </a>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Order Ref</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Payment Method</th>
+                    <th>Status</th>
+                    <th>Total Amount</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var sale in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-primary">#ORD-@sale.Id</td>
+                            <td class="fw-semibold">@sale.CustomerName</td>
+                            <td>@sale.SaleDate.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">@sale.PaymentMethod</span>
+                            </td>
+                            <td>
+                                <span class="badge @(sale.Status == "Completed" ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning")">
+                                    @sale.Status
+                                </span>
+                            </td>
+                            <td class="fw-bold text-success fs-6">₹@sale.TotalAmount.ToString("N2")</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Details" asp-route-id="@sale.Id" class="btn btn-outline-primary" title="View Invoice">
+                                        <i class="bi bi-receipt me-1"></i> Invoice
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@sale.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel and delete this sale? Stock will be restored.');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Cancel Sale">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No sales orders found. Click "Record New Sale" to create an invoice.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

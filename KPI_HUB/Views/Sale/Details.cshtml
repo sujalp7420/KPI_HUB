@@ -1,0 +1,76 @@
+@model KPI_HUB.Models.ViewModels.SaleDetailViewModel
+@{
+    ViewData["Title"] = $"Invoice #ORD-{Model.Id}";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">&larr; Back to Sales</a>
+            <button onclick="window.print()" class="btn btn-outline-primary btn-sm"><i class="bi bi-printer me-1"></i> Print Invoice</button>
+        </div>
+
+        <div class="panel-card shadow-sm border-0 p-5 bg-white" id="invoiceArea">
+            <div class="d-flex justify-content-between align-items-start border-bottom pb-4 mb-4">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <div class="brand-mark" style="width: 38px; height: 38px; font-size: 1.1rem;">$</div>
+                        <h4 class="fw-bold mb-0">KPI HUB</h4>
+                    </div>
+                    <p class="text-muted small mb-0">Startup Finance & Invoice Management</p>
+                </div>
+                <div class="text-end">
+                    <h3 class="fw-bold text-primary mb-1">INVOICE</h3>
+                    <div class="fw-semibold">#ORD-@Model.Id</div>
+                    <small class="text-muted">Date: @Model.SaleDate.ToString("MMMM dd, yyyy")</small>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <label class="small fw-bold text-muted d-block">BILLED TO:</label>
+                    <div class="fs-6 fw-bold">@Model.CustomerName</div>
+                </div>
+                <div class="col-sm-6 text-sm-end">
+                    <label class="small fw-bold text-muted d-block">PAYMENT DETAILS:</label>
+                    <div>Method: <span class="fw-semibold">@Model.PaymentMethod</span></div>
+                    <div>Status: <span class="badge @(Model.Status == "Completed" ? "bg-success-subtle text-success" : "bg-warning-subtle text-warning")">@Model.Status</span></div>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Item Description</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Line Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@item.ProductName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">₹@item.UnitPrice.ToString("N2")</td>
+                                <td class="text-end fw-bold">₹@item.TotalPrice.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold fs-6">Grand Total:</td>
+                            <td class="text-end fw-bold fs-5 text-success">₹@Model.TotalAmount.ToString("N2")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 text-muted small mt-5">
+                Thank you for your business. For billing queries, please contact finance@kpihub.com.
+            </div>
+        </div>
+    </div>
+</div>

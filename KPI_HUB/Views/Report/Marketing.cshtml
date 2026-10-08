@@ -1,0 +1,74 @@
+@model KPI_HUB.Models.ViewModels.MarketingReportViewModel
+@{
+    ViewData["Title"] = "Marketing & ROI Report";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Marketing Efficiency & CAC Report</h4>
+        <p class="text-muted mb-0">Detailed breakdown of customer acquisition costs and returns by marketing campaign</p>
+    </div>
+</div>
+
+<!-- Date Filter Bar -->
+<div class="panel-card shadow-sm border-0 mb-4 py-3">
+    <form asp-action="Marketing" method="get" class="row g-2 align-items-end">
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">FROM DATE</label>
+            <input type="date" name="start" value="@ViewBag.StartDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">TO DATE</label>
+            <input type="date" name="end" value="@ViewBag.EndDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filter Range</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Campaign Name</th>
+                    <th>Cost</th>
+                    <th>Leads</th>
+                    <th>Customers</th>
+                    <th>CAC (₹)</th>
+                    <th>Revenue Generated</th>
+                    <th class="text-end">Marketing ROI</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Campaigns.Any())
+                {
+                    @foreach (var c in Model.Campaigns)
+                    {
+                        var cac = c.Customers > 0 ? Math.Round(c.Cost / c.Customers, 2) : 0m;
+                        <tr>
+                            <td class="fw-bold">@c.Name</td>
+                            <td class="text-danger fw-semibold">₹@c.Cost.ToString("N2")</td>
+                            <td>@c.Leads</td>
+                            <td class="fw-semibold">@c.Customers</td>
+                            <td class="fw-bold text-primary">₹@cac.ToString("N2")</td>
+                            <td class="fw-bold text-success">₹@c.Revenue.ToString("N2")</td>
+                            <td class="text-end">
+                                <span class="badge @(c.Roi >= 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger") fw-bold fs-6">
+                                    @(c.Roi >= 0 ? "+" : "")@c.Roi%
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No campaigns found in selected range.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

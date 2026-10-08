@@ -1,0 +1,47 @@
+@model KPI_HUB.Models.ViewModels.ManageUserRolesViewModel
+@{
+    ViewData["Title"] = "Manage User Roles";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="panel-card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-1">Manage Roles</h5>
+            <p class="text-muted small mb-4">Assign permissions for <strong>@Model.FullName</strong> (@Model.Email)</p>
+
+            <form asp-action="ManageRoles" method="post">
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="FullName" />
+                <input type="hidden" asp-for="Email" />
+
+                <div class="list-group mb-4">
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <label class="list-group-item d-flex align-items-center gap-3 py-3">
+                            <input class="form-check-input flex-shrink-0" type="checkbox" asp-for="@Model.Roles[i].Selected" />
+                            <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold">@Model.Roles[i].RoleName</span>
+                                <small class="text-muted">
+                                    @(Model.Roles[i].RoleName switch
+                                    {
+                                        "Founder" => "Full access to dashboard, KPIs, financial metrics, and company data",
+                                        "Admin" => "Full system administrative privileges & user controls",
+                                        "Accountant" => "Access to Revenues, Expenses, P&L, and Cash Flow",
+                                        "Manager" => "Access to Products, Sales, Customers, and Operations",
+                                        _ => "Standard system access"
+                                    })
+                                </small>
+                            </div>
+                        </label>
+                    }
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Role Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

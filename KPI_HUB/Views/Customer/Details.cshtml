@@ -1,0 +1,105 @@
+@model KPI_HUB.Models.ViewModels.CustomerDetailViewModel
+@{
+    ViewData["Title"] = Model.Name + " - Profile";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1">Customer Profile</h4>
+        <p class="text-muted mb-0">Detailed order history and customer metrics</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm"><i class="bi bi-pencil me-1"></i> Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">&larr; Back to List</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Customer Info Card -->
+    <div class="col-lg-4">
+        <div class="panel-card shadow-sm border-0 h-100">
+            <div class="text-center pb-3 border-bottom mb-3">
+                <div class="avatar-circle mx-auto mb-2" style="width: 60px; height: 60px; font-size: 1.5rem;">
+                    @(Model.Name.Length > 0 ? Model.Name[0].ToString().ToUpper() : "C")
+                </div>
+                <h5 class="fw-bold mb-1">@Model.Name</h5>
+                <span class="badge @(Model.Status == "Active" ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">
+                    @Model.Status
+                </span>
+            </div>
+
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block">EMAIL</label>
+                <div>@Model.Email</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block">PHONE</label>
+                <div>@(Model.Phone ?? "Not specified")</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block">ADDRESS</label>
+                <div>@(Model.Address ?? "Not specified")</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="small fw-bold text-muted d-block">CUSTOMER SINCE</label>
+                <div>@Model.RegistrationDate.ToString("MMMM dd, yyyy")</div>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 mt-4 text-center">
+                <span class="small fw-bold text-muted d-block">TOTAL LIFETIME PURCHASES</span>
+                <span class="fs-4 fw-bold text-success">₹@Model.TotalPurchases.ToString("N2")</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purchase History -->
+    <div class="col-lg-8">
+        <div class="panel-card shadow-sm border-0 h-100">
+            <div class="panel-header">
+                <h5 class="panel-title"><i class="bi bi-receipt text-primary me-2"></i>Purchase History</h5>
+                <a asp-controller="Sale" asp-action="Create" class="btn btn-sm btn-primary"><i class="bi bi-plus-circle me-1"></i> New Sale</a>
+            </div>
+
+            @if (Model.PurchaseHistory.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Order Date</th>
+                                <th>Amount</th>
+                                <th class="text-end">Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model.PurchaseHistory)
+                            {
+                                <tr>
+                                    <td class="fw-bold">#ORD-@order.SaleId</td>
+                                    <td>@order.SaleDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td class="fw-bold text-success">₹@order.TotalAmount.ToString("N2")</td>
+                                    <td class="text-end">
+                                        <a asp-controller="Sale" asp-action="Details" asp-route-id="@order.SaleId" class="btn btn-sm btn-outline-primary">
+                                            View Receipt &rarr;
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-5 text-center text-muted">
+                    <i class="bi bi-cart-x fs-2 d-block mb-2 text-secondary"></i>
+                    No purchases recorded yet for this customer.
+                </div>
+            }
+        </div>
+    </div>
+</div>

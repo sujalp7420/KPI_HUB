@@ -1,0 +1,87 @@
+@model KPI_HUB.Models.ViewModels.ExpenseReportViewModel
+@{
+    ViewData["Title"] = "Expense Audit Report";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Operating Expense Audit</h4>
+        <p class="text-muted mb-0">Cost center breakdown, largest individual outflows, and monthly expenditure trends</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportExcel" asp-route-type="expense" asp-route-start="@ViewBag.StartDate" asp-route-end="@ViewBag.EndDate" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i> Download Excel
+        </a>
+    </div>
+</div>
+
+<!-- Date Filter Bar -->
+<div class="panel-card shadow-sm border-0 mb-4 py-3">
+    <form asp-action="Expense" method="get" class="row g-2 align-items-end">
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">FROM DATE</label>
+            <input type="date" name="start" value="@ViewBag.StartDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">TO DATE</label>
+            <input type="date" name="end" value="@ViewBag.EndDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filter Range</button>
+        </div>
+    </form>
+</div>
+
+<div class="row g-4">
+    <!-- Category Breakdown -->
+    <div class="col-lg-6">
+        <div class="panel-card shadow-sm border-0 h-100">
+            <h5 class="panel-title mb-3"><i class="bi bi-wallet2 text-danger me-2"></i>Expenses by Cost Center</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th class="text-end">Total Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var c in Model.ByCategory)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@c.Category</td>
+                                <td class="text-end fw-bold text-danger">₹@c.Value.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highest Single Expenses -->
+    <div class="col-lg-6">
+        <div class="panel-card shadow-sm border-0 h-100">
+            <h5 class="panel-title mb-3"><i class="bi bi-receipt text-warning me-2"></i>Highest Individual Expenses</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var h in Model.HighestExpenses)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@h.Label</td>
+                                <td class="text-end fw-bold text-danger">₹@h.Value.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

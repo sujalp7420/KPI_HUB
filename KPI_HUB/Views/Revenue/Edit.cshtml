@@ -1,0 +1,82 @@
+@model KPI_HUB.Models.ViewModels.EditRevenueViewModel
+@{
+    ViewData["Title"] = "Edit Revenue Entry";
+    var customers = ViewBag.Customers as IEnumerable<KPI_HUB.Models.ViewModels.CustomerListViewModel> ?? Enumerable.Empty<KPI_HUB.Models.ViewModels.CustomerListViewModel>();
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="panel-card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3">Edit Revenue Entry</h5>
+
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <label asp-for="Date" class="form-label small fw-bold text-muted">DATE *</label>
+                        <input asp-for="Date" type="date" class="form-control" required />
+                        <span asp-validation-for="Date" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Amount" class="form-label small fw-bold text-muted">AMOUNT (₹) *</label>
+                        <input asp-for="Amount" type="number" step="0.01" class="form-control" required />
+                        <span asp-validation-for="Amount" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <label asp-for="Source" class="form-label small fw-bold text-muted">REVENUE SOURCE *</label>
+                        <select asp-for="Source" class="form-select" required>
+                            <option value="Subscription">Subscription / SaaS MRR</option>
+                            <option value="Consulting / Service">Consulting / Service</option>
+                            <option value="Product Sales">Product Sales</option>
+                            <option value="Grant / Funding">Grant / Angel Funding</option>
+                            <option value="Affiliate / Referral">Affiliate / Referral</option>
+                            <option value="Other">Other Revenue</option>
+                        </select>
+                        <span asp-validation-for="Source" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="PaymentMethod" class="form-label small fw-bold text-muted">PAYMENT METHOD</label>
+                        <select asp-for="PaymentMethod" class="form-select">
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Card / Stripe">Card / Stripe</option>
+                            <option value="UPI / Razorpay">UPI / Razorpay</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Cheque">Cheque</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CustomerId" class="form-label small fw-bold text-muted">ASSOCIATED CLIENT</label>
+                    <select asp-for="CustomerId" class="form-select">
+                        <option value="">-- No Client Linked / Direct --</option>
+                        @foreach (var c in customers)
+                        {
+                            <option value="@c.Id">@c.Name (@c.Email)</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ReferenceNumber" class="form-label small fw-bold text-muted">TRANSACTION REF</label>
+                    <input asp-for="ReferenceNumber" class="form-control" />
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Description" class="form-label small fw-bold text-muted">DESCRIPTION</label>
+                    <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-between pt-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Revenue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

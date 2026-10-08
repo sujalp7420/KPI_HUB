@@ -1,0 +1,70 @@
+@model KPI_HUB.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="panel-card shadow-sm border-0 p-4 p-md-5">
+            <div class="text-center mb-4">
+                <div class="brand-mark mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
+                <h4 class="fw-bold">Create Founder Account</h4>
+                <p class="text-muted small">Start tracking startup finance, revenue, and KPIs</p>
+            </div>
+
+            <form asp-action="Register" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label small fw-bold text-muted">FULL NAME</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                        <input asp-for="FullName" class="form-control border-start-0 ps-0" placeholder="e.g. Alex Smith" />
+                    </div>
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label small fw-bold text-muted">EMAIL ADDRESS</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                        <input asp-for="Email" class="form-control border-start-0 ps-0" placeholder="e.g. alex@startup.io" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Role" class="form-label small fw-bold text-muted">INITIAL ROLE</label>
+                    <select asp-for="Role" class="form-select">
+                        <option value="Founder">Founder</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Accountant">Accountant</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                    <span asp-validation-for="Role" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <label asp-for="Password" class="form-label small fw-bold text-muted">PASSWORD</label>
+                        <input asp-for="Password" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="ConfirmPassword" class="form-label small fw-bold text-muted">CONFIRM</label>
+                        <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-2">Create Account</button>
+
+                <div class="text-center mt-3 small">
+                    Already have an account? <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.EmployeeListViewModel>
+@{
+    ViewData["Title"] = "Employees & Payroll";
+    var totalPayroll = Model.Sum(e => e.Salary);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Team & Payroll Management</h4>
+        <p class="text-muted mb-0">Track startup staff, departments, salaries, and recurring employee overhead</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-person-plus me-1"></i> Add Employee
+    </a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Monthly Payroll Burden</span>
+            <div class="kpi-val text-primary">₹@totalPayroll.ToString("N2")</div>
+            <div class="kpi-sub text-muted">@Model.Count() team members</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Email</th>
+                    <th>Department</th>
+                    <th>Role / Position</th>
+                    <th>Salary (₹)</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var emp in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-circle">
+                                        @(emp.Name.Length > 0 ? emp.Name[0].ToString().ToUpper() : "E")
+                                    </div>
+                                    <span>@emp.Name</span>
+                                </div>
+                            </td>
+                            <td class="text-muted">@emp.Email</td>
+                            <td><span class="badge bg-primary-subtle text-primary">@(emp.Department ?? "General")</span></td>
+                            <td class="fw-semibold">@(emp.Position ?? "-")</td>
+                            <td class="fw-bold text-dark fs-6">₹@emp.Salary.ToString("N2")</td>
+                            <td>
+                                <span class="badge @(emp.Status == "Active" ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">
+                                    @emp.Status
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@emp.Id" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@emp.Id" method="post" class="d-inline" onsubmit="return confirm('Remove employee?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No employees registered yet. Click "Add Employee" to register team members.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

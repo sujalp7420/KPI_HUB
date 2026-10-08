@@ -1,0 +1,56 @@
+@model KPI_HUB.Models.ViewModels.CreateCustomerViewModel
+@{
+    ViewData["Title"] = "Add Customer";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="panel-card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3">Add New Customer</h5>
+
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small py-2"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label small fw-bold text-muted">CUSTOMER / COMPANY NAME *</label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Acme Corporation" required />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label small fw-bold text-muted">EMAIL ADDRESS *</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="contact@acme.com" required />
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                        <label asp-for="Phone" class="form-label small fw-bold text-muted">PHONE NUMBER</label>
+                        <input asp-for="Phone" class="form-control" placeholder="+91 9876543210" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+                    <div class="col-sm-6">
+                        <label asp-for="Status" class="form-label small fw-bold text-muted">STATUS</label>
+                        <select asp-for="Status" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Lead">Lead</option>
+                        </select>
+                        <span asp-validation-for="Status" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Address" class="form-label small fw-bold text-muted">BILLING / SHIPPING ADDRESS</label>
+                    <textarea asp-for="Address" class="form-control" rows="2" placeholder="Street, City, State, ZIP"></textarea>
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex justify-content-between pt-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,424 @@
+@model KPI_HUB.Models.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Executive Dashboard";
+}
+
+<!-- Page Header & Action Row -->
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+        <h3 class="fw-bold mb-1">Startup Finance & KPI Hub</h3>
+        <p class="text-muted mb-0">Real-time metrics, cash flow health, and growth indicators</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="Sale" asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-cart-plus me-1"></i> New Sale</a>
+        <a asp-controller="Revenue" asp-action="Create" class="btn btn-outline-success btn-sm"><i class="bi bi-plus-circle me-1"></i> Add Revenue</a>
+        <a asp-controller="Expense" asp-action="Create" class="btn btn-outline-danger btn-sm"><i class="bi bi-dash-circle me-1"></i> Add Expense</a>
+        <a asp-controller="Report" asp-action="ProfitLoss" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-spreadsheet me-1"></i> P&L Statement</a>
+    </div>
+</div>
+
+<!-- Smart Insights & Alerts -->
+@if (Model.Insights.Any())
+{
+    <div class="row g-3 mb-4">
+        @foreach (var insight in Model.Insights)
+        {
+            var alertClass = insight.Tone switch
+            {
+                "success" => "alert-success",
+                "danger" => "alert-danger",
+                "warning" => "alert-warning",
+                _ => "alert-info"
+            };
+            var iconClass = insight.Tone switch
+            {
+                "success" => "bi-check-circle-fill text-success",
+                "danger" => "bi-exclamation-octagon-fill text-danger",
+                "warning" => "bi-exclamation-triangle-fill text-warning",
+                _ => "bi-info-circle-fill text-info"
+            };
+
+            <div class="col-md-6 col-lg-4">
+                <div class="alert @alertClass d-flex align-items-center gap-2 mb-0 shadow-sm border-0 rounded-4 py-3">
+                    <i class="bi @iconClass fs-5"></i>
+                    <div class="small fw-semibold">@insight.Message</div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- Primary Financial KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Total Revenue</span>
+                <div class="kpi-icon-wrap bg-primary-subtle">
+                    <i class="bi bi-currency-rupee"></i>
+                </div>
+            </div>
+            <div class="kpi-val text-primary">₹@Model.TotalRevenue.ToString("N2")</div>
+            <div class="kpi-sub text-muted"><i class="bi bi-graph-up text-success me-1"></i> All Inflows & Sales</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Total Expenses</span>
+                <div class="kpi-icon-wrap bg-danger-subtle">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+            <div class="kpi-val text-danger">₹@Model.TotalExpenses.ToString("N2")</div>
+            <div class="kpi-sub text-muted"><i class="bi bi-arrow-down-right text-danger me-1"></i> Operating Outflows</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Net Profit</span>
+                <div class="kpi-icon-wrap @(Model.NetProfit >= 0 ? "bg-success-subtle" : "bg-danger-subtle")">
+                    <i class="bi @(Model.NetProfit >= 0 ? "bi-cash-coin" : "bi-exclamation-circle")"></i>
+                </div>
+            </div>
+            <div class="kpi-val @(Model.NetProfit >= 0 ? "text-success" : "text-danger")">
+                ₹@Model.NetProfit.ToString("N2")
+            </div>
+            <div class="kpi-sub text-muted">
+                @(Model.NetProfit >= 0 ? "Profitable Business" : "Operating at Loss")
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Profit Margin</span>
+                <div class="kpi-icon-wrap bg-purple-subtle">
+                    <i class="bi bi-percent"></i>
+                </div>
+            </div>
+            <div class="kpi-val text-dark">@Model.ProfitMargin%</div>
+            <div class="kpi-sub text-muted">
+                <span class="badge @(Model.ProfitMargin > 20 ? "bg-success" : (Model.ProfitMargin > 0 ? "bg-info text-dark" : "bg-danger"))">
+                    @(Model.ProfitMargin > 20 ? "Healthy" : (Model.ProfitMargin > 0 ? "Moderate" : "Negative"))
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Business & Marketing KPIs -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Total Customers</span>
+                <div class="kpi-icon-wrap bg-info-subtle">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+            <div class="kpi-val">@Model.TotalCustomers</div>
+            <div class="kpi-sub text-muted"><a asp-controller="Customer" asp-action="Index" class="text-decoration-none">View Customers &rarr;</a></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Total Orders Sold</span>
+                <div class="kpi-icon-wrap bg-warning-subtle">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+            </div>
+            <div class="kpi-val">@Model.TotalSales</div>
+            <div class="kpi-sub text-muted"><a asp-controller="Sale" asp-action="Index" class="text-decoration-none">View Sales History &rarr;</a></div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Avg. Order Value (AOV)</span>
+                <div class="kpi-icon-wrap bg-primary-subtle">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+            </div>
+            <div class="kpi-val">₹@Model.AverageOrderValue.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Per customer transaction</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="kpi-label">Marketing ROI</span>
+                <div class="kpi-icon-wrap bg-success-subtle">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+            </div>
+            <div class="kpi-val text-success">@Model.MarketingRoi%</div>
+            <div class="kpi-sub text-muted"><a asp-controller="Marketing" asp-action="Index" class="text-decoration-none">View Campaigns &rarr;</a></div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Chart.js Visualizations -->
+<div class="row g-4 mb-4">
+    <!-- Revenue vs Expenses -->
+    <div class="col-lg-8">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title"><i class="bi bi-bar-chart-line text-primary me-2"></i>Revenue vs. Expenses Trend</h5>
+                    <small class="text-muted">Monthly comparison of business inflows vs operating expenses</small>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="revExpChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- Expense Breakdown Doughnut -->
+    <div class="col-lg-4">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title"><i class="bi bi-pie-chart text-danger me-2"></i>Expenses by Category</h5>
+                    <small class="text-muted">Where your startup funds are spent</small>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="expenseCategoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Customer Growth Trend -->
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title"><i class="bi bi-graph-up-arrow text-success me-2"></i>Customer Acquisition Trend</h5>
+                    <small class="text-muted">New customers onboarded per month</small>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="customerGrowthChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- Net Profit Trend -->
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title"><i class="bi bi-currency-exchange text-info me-2"></i>Monthly Net Profit</h5>
+                    <small class="text-muted">Bottom-line trajectory over the past 6 months</small>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="profitTrendChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Row: Inventory Alerts & Top Products -->
+<div class="row g-4">
+    <!-- Low Stock Inventory Alerts -->
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <h5 class="panel-title text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Inventory Alerts</h5>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-sm btn-outline-primary">Manage Stock</a>
+            </div>
+            @if (Model.LowStockProducts.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Min. Level</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var prod in Model.LowStockProducts)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@prod.Name</td>
+                                    <td><span class="badge bg-light text-dark">@prod.Category</span></td>
+                                    <td class="text-danger fw-bold">@prod.StockQuantity units</td>
+                                    <td>@prod.MinimumStock units</td>
+                                    <td><span class="badge bg-danger">Reorder Needed</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-check-circle fs-3 text-success d-block mb-2"></i>
+                    All product inventory levels are healthy.
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Top Products Sold -->
+    <div class="col-lg-6">
+        <div class="panel-card h-100">
+            <div class="panel-header">
+                <h5 class="panel-title"><i class="bi bi-trophy text-warning me-2"></i>Top Selling Products</h5>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-sm btn-outline-secondary">All Products</a>
+            </div>
+            @if (Model.SalesByProduct.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Units Sold</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.SalesByProduct)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@item.Label</td>
+                                    <td class="fw-bold text-primary">@item.Quantity</td>
+                                    <td style="width: 40%;">
+                                        <div class="progress" style="height: 8px;">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: @(Math.Min(100, item.Quantity * 10))%"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="p-4 text-center text-muted">No product sales recorded yet.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Chart 1: Revenue vs Expenses
+        const revLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenueExpense.Select(x => x.Label)));
+        const revData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenueExpense.Select(x => x.Revenue)));
+        const expData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyRevenueExpense.Select(x => x.Expenses)));
+
+        new Chart(document.getElementById('revExpChart'), {
+            type: 'bar',
+            data: {
+                labels: revLabels,
+                datasets: [
+                    {
+                        label: 'Revenue (₹)',
+                        data: revData,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Expenses (₹)',
+                        data: expData,
+                        backgroundColor: '#ef4444',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { callback: v => '₹' + v.toLocaleString() } }
+                }
+            }
+        });
+
+        // Chart 2: Expenses by Category
+        const catLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExpenseByCategory.Select(x => x.Label)));
+        const catData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ExpenseByCategory.Select(x => x.Value)));
+
+        new Chart(document.getElementById('expenseCategoryChart'), {
+            type: 'doughnut',
+            data: {
+                labels: catLabels,
+                datasets: [{
+                    data: catData,
+                    backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#64748b', '#ec4899']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // Chart 3: Customer Growth
+        const custLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CustomerGrowth.Select(x => x.Label)));
+        const custData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.CustomerGrowth.Select(x => x.Count)));
+
+        new Chart(document.getElementById('customerGrowthChart'), {
+            type: 'line',
+            data: {
+                labels: custLabels,
+                datasets: [{
+                    label: 'New Customers',
+                    data: custData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+
+        // Chart 4: Profit Trend
+        const profitLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyProfit.Select(x => x.Label)));
+        const profitData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyProfit.Select(x => x.Profit)));
+
+        new Chart(document.getElementById('profitTrendChart'), {
+            type: 'line',
+            data: {
+                labels: profitLabels,
+                datasets: [{
+                    label: 'Net Profit (₹)',
+                    data: profitData,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    fill: true,
+                    tension: 0.35,
+                    pointRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { ticks: { callback: v => '₹' + v.toLocaleString() } } }
+            }
+        });
+    });
+</script>
+}

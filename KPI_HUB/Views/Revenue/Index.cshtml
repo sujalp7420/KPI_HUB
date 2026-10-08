@@ -1,0 +1,79 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.RevenueListViewModel>
+@{
+    ViewData["Title"] = "Revenue Streams";
+    var totalRevenue = Model.Sum(r => r.Amount);
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Direct Revenue Streams</h4>
+        <p class="text-muted mb-0">Record and track subscriptions, consulting fees, contracts, and other business inflows</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Revenue Entry
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Recorded Inflows</span>
+            <div class="kpi-val text-primary">₹@totalRevenue.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Across @Model.Count() revenue entries</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Source / Stream</th>
+                    <th>Associated Client</th>
+                    <th>Payment Method</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var rev in Model)
+                    {
+                        <tr>
+                            <td>@rev.Date.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge bg-primary-subtle text-primary fw-bold">@rev.Source</span></td>
+                            <td class="fw-semibold">@rev.CustomerName</td>
+                            <td><span class="badge bg-light text-dark border">@rev.PaymentMethod</span></td>
+                            <td class="text-muted small">@(rev.Description ?? "-")</td>
+                            <td class="fw-bold text-success fs-6">₹@rev.Amount.ToString("N2")</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@rev.Id" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@rev.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this revenue entry?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No revenue records found. Click "Add Revenue Entry" to start.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

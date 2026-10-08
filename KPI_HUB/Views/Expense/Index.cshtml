@@ -1,0 +1,101 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.ExpenseListViewModel>
+@{
+    ViewData["Title"] = "Expense Management";
+    var totalExpenses = Model.Sum(e => e.Amount);
+    var selectedCat = ViewBag.SelectedCategory as string;
+    var categories = new[] { "All", "Salary", "Rent", "Marketing", "Software", "Electricity", "Travel", "Office", "Equipment", "Other" };
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Expense Management</h4>
+        <p class="text-muted mb-0">Record and classify all startup operational, payroll, and marketing outflows</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-dash-circle me-1"></i> Record Expense
+    </a>
+</div>
+
+<!-- Category Pills & KPI Card -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Filtered Expenses</span>
+            <div class="kpi-val text-danger">₹@totalExpenses.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Across @Model.Count() entries</div>
+        </div>
+    </div>
+    <div class="col-md-8 d-flex align-items-center">
+        <div class="d-flex flex-wrap gap-1">
+            @foreach (var cat in categories)
+            {
+                var isSelected = (cat == "All" && string.IsNullOrEmpty(selectedCat)) || (cat == selectedCat);
+                <a asp-action="Index" asp-route-category="@(cat == "All" ? "" : cat)"
+                   class="btn btn-sm @(isSelected ? "btn-dark fw-bold" : "btn-outline-secondary")">
+                    @cat
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Vendor / Payee</th>
+                    <th>Payment Method</th>
+                    <th>Amount</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var exp in Model)
+                    {
+                        var badgeColor = exp.Category switch
+                        {
+                            "Salary" => "bg-primary-subtle text-primary",
+                            "Marketing" => "bg-success-subtle text-success",
+                            "Software" => "bg-info-subtle text-info",
+                            "Rent" => "bg-warning-subtle text-warning",
+                            _ => "bg-secondary-subtle text-secondary"
+                        };
+
+                        <tr>
+                            <td>@exp.Date.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge @badgeColor fw-bold">@exp.Category</span></td>
+                            <td class="fw-semibold">@(exp.Description ?? "-")</td>
+                            <td><span class="badge bg-light text-dark border">@(exp.Vendor ?? "N/A")</span></td>
+                            <td class="text-muted small">@exp.PaymentMethod</td>
+                            <td class="fw-bold text-danger fs-6">₹@exp.Amount.ToString("N2")</td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@exp.Id" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@exp.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this expense entry?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No expenses found for this category. Click "Record Expense" to create one.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

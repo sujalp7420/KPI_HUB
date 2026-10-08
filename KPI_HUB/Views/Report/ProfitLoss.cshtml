@@ -1,0 +1,102 @@
+@model KPI_HUB.Models.ViewModels.ReportOverviewViewModel
+@{
+    ViewData["Title"] = "Profit & Loss Statement";
+    var revReport = ViewBag.RevenueReport as KPI_HUB.Models.ViewModels.RevenueReportViewModel;
+    var expReport = ViewBag.ExpenseReport as KPI_HUB.Models.ViewModels.ExpenseReportViewModel;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Profit & Loss Statement</h4>
+        <p class="text-muted mb-0">Summary of startup revenues, costs, and net income</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportExcel" asp-route-type="profitloss" asp-route-start="@ViewBag.StartDate" asp-route-end="@ViewBag.EndDate" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i> Download Excel
+        </a>
+        <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-printer me-1"></i> Print
+        </button>
+    </div>
+</div>
+
+<!-- Date Filter Bar -->
+<div class="panel-card shadow-sm border-0 mb-4 py-3">
+    <form asp-action="ProfitLoss" method="get" class="row g-2 align-items-end">
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">FROM DATE</label>
+            <input type="date" name="start" value="@ViewBag.StartDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <label class="small fw-bold text-muted">TO DATE</label>
+            <input type="date" name="end" value="@ViewBag.EndDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-primary btn-sm w-100">Filter Range</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel-card shadow-sm border-0 mb-4 p-4">
+    <h5 class="fw-bold mb-4 border-bottom pb-2">Statement of Profit & Loss</h5>
+
+    <table class="table table-borderless align-middle mb-0">
+        <tbody>
+            <!-- Revenue Section -->
+            <tr class="table-light">
+                <td colspan="2" class="fw-bold text-primary fs-6">1. REVENUES & INFLOWS</td>
+            </tr>
+            @if (revReport != null && revReport.BySource.Any())
+            {
+                @foreach (var s in revReport.BySource)
+                {
+                    <tr>
+                        <td class="ps-4">@s.Source</td>
+                        <td class="text-end fw-semibold">₹@s.Value.ToString("N2")</td>
+                    </tr>
+                }
+            }
+            <tr class="border-top border-bottom">
+                <td class="fw-bold">TOTAL REVENUE (A)</td>
+                <td class="text-end fw-bold text-primary fs-6">₹@Model.TotalRevenue.ToString("N2")</td>
+            </tr>
+
+            <!-- Blank space -->
+            <tr><td colspan="2" style="height: 1.5rem;"></td></tr>
+
+            <!-- Expenses Section -->
+            <tr class="table-light">
+                <td colspan="2" class="fw-bold text-danger fs-6">2. OPERATING EXPENDITURES (OPEX)</td>
+            </tr>
+            @if (expReport != null && expReport.ByCategory.Any())
+            {
+                @foreach (var e in expReport.ByCategory)
+                {
+                    <tr>
+                        <td class="ps-4">@e.Category</td>
+                        <td class="text-end fw-semibold text-danger">₹@e.Value.ToString("N2")</td>
+                    </tr>
+                }
+            }
+            <tr class="border-top border-bottom">
+                <td class="fw-bold">TOTAL EXPENSES (B)</td>
+                <td class="text-end fw-bold text-danger fs-6">₹@Model.TotalExpenses.ToString("N2")</td>
+            </tr>
+
+            <!-- Blank space -->
+            <tr><td colspan="2" style="height: 1.5rem;"></td></tr>
+
+            <!-- Net Profit Section -->
+            <tr class="@(Model.NetProfit >= 0 ? "table-success" : "table-danger")">
+                <td class="fw-bold fs-5 py-3">NET PROFIT / (LOSS) (A - B)</td>
+                <td class="text-end fw-bold fs-5 py-3 @(Model.NetProfit >= 0 ? "text-success" : "text-danger")">
+                    ₹@Model.NetProfit.ToString("N2")
+                </td>
+            </tr>
+            <tr>
+                <td class="fw-semibold text-muted">Net Profit Margin %</td>
+                <td class="text-end fw-bold">@Model.ProfitMargin%</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,87 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.ProductListViewModel>
+@{
+    ViewData["Title"] = "Products & Services";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Products & Services Catalog</h4>
+        <p class="text-muted mb-0">Manage stock quantities, cost margins, and selling prices</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-box-seam me-1"></i> Add Product
+    </a>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Selling Price</th>
+                    <th>Cost Price</th>
+                    <th>Unit Profit Margin</th>
+                    <th>Stock Level</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var prod in Model)
+                    {
+                        var isLowStock = prod.StockQuantity <= prod.MinimumStock;
+                        <tr>
+                            <td class="fw-bold">@prod.Name</td>
+                            <td><span class="badge bg-light text-dark border">@prod.Category</span></td>
+                            <td class="fw-bold text-primary">₹@prod.Price.ToString("N2")</td>
+                            <td class="text-muted">₹@prod.CostPrice.ToString("N2")</td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success">
+                                    +₹@prod.ProfitPerProduct.ToString("N2")
+                                    @(prod.Price > 0 ? $"({Math.Round((prod.ProfitPerProduct / prod.Price) * 100, 1)}%)" : "")
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold @(isLowStock ? "text-danger" : "text-dark")">@prod.StockQuantity</span>
+                                    <small class="text-muted">(min: @prod.MinimumStock)</small>
+                                    @if (isLowStock)
+                                    {
+                                        <span class="badge bg-danger" title="Stock at or below minimum reorder level">Low</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge @(prod.Status == "Active" ? "bg-success-subtle text-success" : "bg-secondary-subtle text-secondary")">
+                                    @prod.Status
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@prod.Id" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@prod.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this product?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No products found. Click "Add Product" to add items.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

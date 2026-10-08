@@ -1,0 +1,129 @@
+@model IEnumerable<KPI_HUB.Models.ViewModels.MarketingCampaignListViewModel>
+@{
+    ViewData["Title"] = "Marketing Campaigns";
+    var totalCost = Model.Sum(c => c.ActualCost);
+    var totalRev = Model.Sum(c => c.RevenueGenerated);
+    var totalAcquired = Model.Sum(c => c.CustomersAcquired);
+    var overallCAC = totalAcquired > 0 ? Math.Round(totalCost / totalAcquired, 2) : 0m;
+    var overallROI = totalCost > 0 ? Math.Round(((totalRev - totalCost) / totalCost) * 100m, 2) : 0m;
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Marketing Campaigns & Unit Economics</h4>
+        <p class="text-muted mb-0">Track platform spends, Customer Acquisition Cost (CAC), and Marketing Return on Investment (ROI)</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-sm">
+        <i class="bi bi-megaphone me-1"></i> New Campaign
+    </a>
+</div>
+
+<!-- Marketing KPI Summary Row -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Marketing Spend</span>
+            <div class="kpi-val text-danger">₹@totalCost.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Across @Model.Count() campaigns</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Revenue Generated</span>
+            <div class="kpi-val text-success">₹@totalRev.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Campaign attributed revenue</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Blended CAC</span>
+            <div class="kpi-val text-primary">₹@overallCAC.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Cost per customer acquired</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Overall Marketing ROI</span>
+            <div class="kpi-val @(overallROI >= 0 ? "text-success" : "text-danger")">@overallROI%</div>
+            <div class="kpi-sub text-muted">[(Rev - Cost) / Cost] * 100</div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-card shadow-sm border-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Campaign Name</th>
+                    <th>Platform</th>
+                    <th>Actual Spend</th>
+                    <th>Leads</th>
+                    <th>Customers Acquired</th>
+                    <th>CAC</th>
+                    <th>Revenue Generated</th>
+                    <th>ROI</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var c in Model)
+                    {
+                        var cac = c.CustomersAcquired > 0 ? Math.Round(c.ActualCost / c.CustomersAcquired, 2) : 0m;
+                        var platformIcon = c.Platform.ToLower() switch
+                        {
+                            var p when p.Contains("google") => "bi-google text-danger",
+                            var p when p.Contains("meta") || p.Contains("facebook") || p.Contains("instagram") => "bi-meta text-primary",
+                            var p when p.Contains("linkedin") => "bi-linkedin text-info",
+                            _ => "bi-broadcast text-secondary"
+                        };
+
+                        <tr>
+                            <td class="fw-bold">@c.Name</td>
+                            <td>
+                                <i class="bi @platformIcon me-1"></i>
+                                <span class="badge bg-light text-dark border">@c.Platform</span>
+                            </td>
+                            <td class="fw-semibold text-danger">₹@c.ActualCost.ToString("N2")</td>
+                            <td>@c.Leads</td>
+                            <td class="fw-semibold">@c.CustomersAcquired</td>
+                            <td class="fw-bold text-primary">₹@cac.ToString("N2")</td>
+                            <td class="fw-bold text-success">₹@c.RevenueGenerated.ToString("N2")</td>
+                            <td>
+                                <span class="badge @(c.Roi >= 0 ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger") fw-bold">
+                                    @(c.Roi >= 0 ? "+" : "")@c.Roi.ToString("F1")%
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(c.Status == "Active" ? "bg-success" : "bg-secondary")">
+                                    @c.Status
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-outline-secondary" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this marketing campaign?');">
+                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">No campaigns found. Click "New Campaign" to track your ads and channels.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

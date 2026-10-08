@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Startup Finance & KPI Hub";
+}
+
+<div class="row align-items-center py-5">
+    <div class="col-lg-7">
+        <div class="pe-lg-5">
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-bold mb-3">
+                <i class="bi bi-rocket-takeoff-fill me-1"></i> Startup Finance & Intelligence
+            </span>
+            <h1 class="display-4 fw-extrabold mb-3" style="letter-spacing: -0.03em;">
+                From Business Data to <span class="text-primary">Executive KPIs</span> & Real-Time Intelligence
+            </h1>
+            <p class="lead text-muted mb-4">
+                Record your startup's revenues, expenses, customer orders, and marketing spends. Automatically generate Profit & Loss statements, Cash Flow tracking, CAC, and ROI metrics.
+            </p>
+
+            <div class="d-flex flex-wrap gap-3 mb-5">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg px-4 py-3 shadow-sm">
+                    <i class="bi bi-lightning-charge me-1"></i> Get Started Free
+                </a>
+                <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-lg px-4 py-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Demo Hub
+                </a>
+            </div>
+
+            <div class="row g-3 pt-3 border-top">
+                <div class="col-sm-4">
+                    <h5 class="fw-bold mb-1 text-dark">₹0 / Setup</h5>
+                    <small class="text-muted">Built with ASP.NET Core & EF Core</small>
+                </div>
+                <div class="col-sm-4">
+                    <h5 class="fw-bold mb-1 text-primary">15+ Modules</h5>
+                    <small class="text-muted">Finance, Sales, CAC & P&L</small>
+                </div>
+                <div class="col-sm-4">
+                    <h5 class="fw-bold mb-1 text-success">Excel & Charts</h5>
+                    <small class="text-muted">Interactive Chart.js + Export</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mt-5 mt-lg-0">
+        <div class="panel-card shadow p-4 border-0 bg-white rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="brand-mark" style="width: 36px; height: 36px; font-size: 1rem;">$</div>
+                    <span class="fw-bold">Financial Preview</span>
+                </div>
+                <span class="badge bg-success-subtle text-success">Live Engine</span>
+            </div>
+
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <small class="text-muted d-block fw-bold">TOTAL REVENUE</small>
+                        <span class="fs-5 fw-bold text-primary">₹5,00,000</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <small class="text-muted d-block fw-bold">TOTAL EXPENSES</small>
+                        <span class="fs-5 fw-bold text-danger">₹3,20,000</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 bg-success-subtle text-success rounded-3 mb-3 text-center">
+                <small class="fw-bold d-block">NET PROFIT (36.0% Margin)</small>
+                <span class="fs-4 fw-bold">₹1,80,000</span>
+            </div>
+
+            <div class="d-grid mt-4">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary py-2">
+                    Enter KPI Hub &rarr;
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

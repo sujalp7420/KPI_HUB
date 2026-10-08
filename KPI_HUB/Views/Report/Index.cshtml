@@ -1,0 +1,162 @@
+@model KPI_HUB.Models.ViewModels.ReportOverviewViewModel
+@{
+    ViewData["Title"] = "Financial Reports Hub";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+    <div>
+        <h4 class="fw-bold mb-1">Financial Statements & Analytical Reports</h4>
+        <p class="text-muted mb-0">Audited views of profitability, unit economics, cash flow, and business health</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="ExportExcel" asp-route-type="profitloss" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export P&L (.xlsx)
+        </a>
+    </div>
+</div>
+
+<!-- High-Level Financial Snapshot -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Lifetime Revenue</span>
+            <div class="kpi-val text-primary">₹@Model.TotalRevenue.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Direct revenue + Orders</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Total Outflows</span>
+            <div class="kpi-val text-danger">₹@Model.TotalExpenses.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Operational + Payroll</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Cumulative Net Profit</span>
+            <div class="kpi-val @(Model.NetProfit >= 0 ? "text-success" : "text-danger")">₹@Model.NetProfit.ToString("N2")</div>
+            <div class="kpi-sub text-muted">@Model.ProfitMargin% Net Margin</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="kpi-card py-3">
+            <span class="kpi-label">Average Order Value</span>
+            <div class="kpi-val text-dark">₹@Model.AverageOrderValue.ToString("N2")</div>
+            <div class="kpi-sub text-muted">Across @Model.TotalSales sales</div>
+        </div>
+    </div>
+</div>
+
+<!-- Available Reports Navigation Grid -->
+<div class="row g-4">
+    <!-- P&L Statement -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-primary-subtle">
+                        <i class="bi bi-file-earmark-spreadsheet text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Profit & Loss Statement</h5>
+                </div>
+                <p class="text-muted small">Comprehensive income statement showing gross revenue, operational expenditures, and bottom-line margin.</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
+                <a asp-action="ProfitLoss" class="btn btn-primary btn-sm">View P&L &rarr;</a>
+                <a asp-action="ExportExcel" asp-route-type="profitloss" class="text-success small fw-bold text-decoration-none"><i class="bi bi-download me-1"></i> Excel</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-success-subtle">
+                        <i class="bi bi-cash-stack text-success"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Revenue Inflows Report</h5>
+                </div>
+                <p class="text-muted small">Inflow breakdown categorized by product sales, recurring subscriptions, client contracts, and monthly seasonality.</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
+                <a asp-action="Revenue" class="btn btn-outline-primary btn-sm">View Revenue &rarr;</a>
+                <a asp-action="ExportExcel" asp-route-type="revenue" class="text-success small fw-bold text-decoration-none"><i class="bi bi-download me-1"></i> Excel</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expense Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-danger-subtle">
+                        <i class="bi bi-wallet2 text-danger"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Expense Breakdown Report</h5>
+                </div>
+                <p class="text-muted small">Detailed audit of organizational overhead categorized into salaries, marketing, SaaS licenses, office rent, and travel.</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-3">
+                <a asp-action="Expense" class="btn btn-outline-primary btn-sm">View Expenses &rarr;</a>
+                <a asp-action="ExportExcel" asp-route-type="expense" class="text-success small fw-bold text-decoration-none"><i class="bi bi-download me-1"></i> Excel</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Growth Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-info-subtle">
+                        <i class="bi bi-people text-info"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Customer Growth Report</h5>
+                </div>
+                <p class="text-muted small">Monthly acquisition velocity, active customer counts, retention trajectories, and percentage growth rates.</p>
+            </div>
+            <div class="pt-3 border-top mt-3">
+                <a asp-action="CustomerGrowth" class="btn btn-outline-primary btn-sm">View Growth &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Performance Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-warning-subtle">
+                        <i class="bi bi-trophy text-warning"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Product Sales & Performance</h5>
+                </div>
+                <p class="text-muted small">Top revenue generating products, gross unit profit margins, and sales volume leaders.</p>
+            </div>
+            <div class="pt-3 border-top mt-3">
+                <a asp-action="ProductSales" class="btn btn-outline-primary btn-sm">View Products &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marketing CAC & ROI Report -->
+    <div class="col-md-6 col-lg-4">
+        <div class="panel-card h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="kpi-icon-wrap bg-purple-subtle">
+                        <i class="bi bi-bullseye text-primary"></i>
+                    </div>
+                    <h5 class="fw-bold mb-0">Marketing Performance & ROI</h5>
+                </div>
+                <p class="text-muted small">Paid acquisition unit economics: CAC by channel, conversion rates, and return on marketing spend.</p>
+            </div>
+            <div class="pt-3 border-top mt-3">
+                <a asp-action="Marketing" class="btn btn-outline-primary btn-sm">View Marketing ROI &rarr;</a>
+            </div>
+        </div>
+    </div>
+</div>
