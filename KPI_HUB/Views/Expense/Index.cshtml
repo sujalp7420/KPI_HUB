@@ -11,9 +11,12 @@
         <h4 class="fw-bold mb-1">Expense Management</h4>
         <p class="text-muted mb-0">Record and classify all startup operational, payroll, and marketing outflows</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary btn-sm">
-        <i class="bi bi-dash-circle me-1"></i> Record Expense
-    </a>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-dash-circle me-1"></i> Record Expense
+        </a>
+    }
 </div>
 
 <!-- Category Pills & KPI Card -->
@@ -76,14 +79,21 @@
                             <td class="fw-bold text-danger fs-6">₹@exp.Amount.ToString("N2")</td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a asp-action="Edit" asp-route-id="@exp.Id" class="btn btn-outline-secondary" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@exp.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this expense entry?');">
-                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@exp.Id" class="btn btn-outline-secondary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@exp.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this expense entry?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Read-Only</span>
+                                    }
                                 </div>
                             </td>
                         </tr>

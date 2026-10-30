@@ -37,7 +37,7 @@ public class RegisterViewModel
     public string ConfirmPassword { get; set; } = string.Empty;
 
     [Required]
-    public string Role { get; set; } = "Founder";
+    public string Role { get; set; } = "Viewer";
 }
 
 public class ProfileViewModel
@@ -48,6 +48,61 @@ public class ProfileViewModel
     public string? PhoneNumber { get; set; }
     public IList<string> Roles { get; set; } = new List<string>();
     public DateTime CreatedAt { get; set; }
+}
+
+public class AdminIndexViewModel
+{
+    public List<AdminUserViewModel> Users { get; set; } = new();
+    public List<RoleViewModel> Roles { get; set; } = new();
+    public CreateUserViewModel NewUser { get; set; } = new();
+    public CreateRoleViewModel NewRole { get; set; } = new();
+}
+
+public class RoleViewModel
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int UserCount { get; set; }
+}
+
+public class CreateUserViewModel
+{
+    [Required]
+    [Display(Name = "Full Name")]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+
+    [Required]
+    [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+    [DataType(DataType.Password)]
+    public string Password { get; set; } = string.Empty;
+
+    [Required]
+    public string Role { get; set; } = "Viewer";
+}
+
+public class EditUserViewModel
+{
+    [Required]
+    public string UserId { get; set; } = string.Empty;
+
+    [Required]
+    [Display(Name = "Full Name")]
+    public string FullName { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+}
+
+public class CreateRoleViewModel
+{
+    [Required]
+    public string RoleName { get; set; } = string.Empty;
 }
 
 public class AdminUserViewModel

@@ -28,13 +28,33 @@ public class DbInitializer
 
     private async Task SeedRolesAsync()
     {
-        string[] roles = ["Founder", "Manager", "Accountant", "Admin"];
+        string[] roles = ["Admin", "Manager", "Viewer"];
 
         foreach (var role in roles)
         {
             if (!await _roleManager.RoleExistsAsync(role))
             {
                 await _roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
+
+        string[] obsoleteRoles = ["Founder", "Accountant"];
+        foreach (var obsoleteRole in obsoleteRoles)
+        {
+            var roleObj = await _roleManager.FindByNameAsync(obsoleteRole);
+            if (roleObj != null)
+            {
+                var usersInObsoleteRole = await _userManager.GetUsersInRoleAsync(obsoleteRole);
+                foreach (var user in usersInObsoleteRole)
+                {
+                    await _userManager.RemoveFromRoleAsync(user, obsoleteRole);
+                    var fallbackRole = obsoleteRole == "Founder" ? "Admin" : "Manager";
+                    if (!await _userManager.IsInRoleAsync(user, fallbackRole))
+                    {
+                        await _userManager.AddToRoleAsync(user, fallbackRole);
+                    }
+                }
+                await _roleManager.DeleteAsync(roleObj);
             }
         }
     }
@@ -44,9 +64,8 @@ public class DbInitializer
         var users = new[]
         {
             new { Email = "admin@kpihub.com", Password = "Admin123!", Role = "Admin", FullName = "System Admin" },
-            new { Email = "founder@kpihub.com", Password = "Founder123!", Role = "Founder", FullName = "Founder" },
             new { Email = "manager@kpihub.com", Password = "Manager123!", Role = "Manager", FullName = "Operations Manager" },
-            new { Email = "accountant@kpihub.com", Password = "Accountant123!", Role = "Accountant", FullName = "Finance Lead" }
+            new { Email = "viewer@kpihub.com", Password = "Viewer123!", Role = "Viewer", FullName = "System Viewer" }
         };
 
         foreach (var userData in users)
@@ -67,6 +86,14 @@ public class DbInitializer
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, userData.Role);
+                }
+            }
+            else
+            {
+                var currentRoles = await _userManager.GetRolesAsync(existingUser);
+                if (!currentRoles.Any())
+                {
+                    await _userManager.AddToRoleAsync(existingUser, userData.Role);
                 }
             }
         }

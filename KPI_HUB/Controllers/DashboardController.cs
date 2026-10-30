@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class DashboardController : Controller
 {
     private readonly IDashboardService _dashboardService;

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class MarketingController : Controller
 {
     private readonly IMarketingService _marketingService;
@@ -22,12 +22,14 @@ public class MarketingController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public IActionResult Create()
     {
         return View(new CreateMarketingCampaignViewModel());
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateMarketingCampaignViewModel model)
     {
@@ -39,6 +41,7 @@ public class MarketingController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _marketingService.GetCampaignForEditAsync(id);
@@ -48,6 +51,7 @@ public class MarketingController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EditMarketingCampaignViewModel model)
     {
@@ -59,6 +63,7 @@ public class MarketingController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {

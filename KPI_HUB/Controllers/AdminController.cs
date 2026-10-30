@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize(Roles = "Admin,Founder")]
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -38,28 +38,33 @@ public class AdminController : Controller
             });
         }
 
-        return View(userViewModels);
-    }
+        var rolesList = await _roleManager.Roles.ToListAsync();
+        var roleViewModels = new List<RoleViewModel>();
 
-    [HttpGet]
-    public async Task<IActionResult> ManageRoles(string id)
-    {
-        var user = await _userManager.FindByIdAsync(id);
-        if (user == null) return NotFound();
-
-        var userRoles = await _userManager.GetRolesAsync(user);
-        var allRoles = await _roleManager.Roles.ToListAsync();
-
-        var model = new ManageUserRolesViewModel
+        foreach (var r in rolesList)
         {
-            UserId = user.Id,
-            FullName = user.FullName ?? string.Empty,
-            Email = user.Email ?? string.Empty,
-            Roles = allRoles.Select(r => new RoleSelectionItem
+            var usersInRole = await _userManager.GetUsersInRoleAsync(r.Name!);
+            string desc = r.Name switch
             {
-                RoleName = r.Name ?? string.Empty,
-                Selected = userRoles.Contains(r.Name ?? string.Empty)
-            }).ToList()
+                "Admin" => "Full access to the application, including managing users and roles.",
+                "Manager" => "Can manage business records and view reports.",
+                "Viewer" => "Can view dashboards, campaigns, leads, and reports but cannot create, edit, or delete any records.",
+                _ => "Custom role permissions"
+            };
+
+            roleViewModels.Add(new RoleViewModel
+            {
+                Id = r.Id,
+                Name = r.Name ?? string.Empty,
+                Description = desc,
+                UserCount = usersInRole.Count
+            });
+        }
+
+        var model = new AdminIndexViewModel
+        {
+            Users = userViewModels,
+            Roles = roleViewModels
         };
 
         return View(model);
@@ -67,29 +72,180 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> ManageRoles(ManageUserRolesViewModel model)
+    public async Task<IActionResult> CreateUser(CreateUserViewModel model)
     {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Please fill in all required fields to create a user.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var existingUser = await _userManager.FindByEmailAsync(model.Email);
+        if (existingUser != null)
+        {
+            TempData["ErrorMessage"] = "A user with this email address already exists.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FullName = model.FullName,
+            EmailConfirmed = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+        if (result.Succeeded)
+        {
+            if (await _roleManager.RoleExistsAsync(model.Role))
+            {
+                await _userManager.AddToRoleAsync(user, model.Role);
+            }
+            TempData["SuccessMessage"] = $"User '{model.FullName}' created successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditUser(EditUserViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            TempData["ErrorMessage"] = "Invalid user details provided.";
+            return RedirectToAction(nameof(Index));
+        }
+
         var user = await _userManager.FindByIdAsync(model.UserId);
-        if (user == null) return NotFound();
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "User not found.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        user.FullName = model.FullName;
+        user.Email = model.Email;
+        user.UserName = model.Email;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (result.Succeeded)
+        {
+            TempData["SuccessMessage"] = $"User details updated for {user.Email}.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateUserRoles(string userId, List<string> selectedRoles)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "User not found.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        selectedRoles ??= new List<string>();
 
         var currentRoles = await _userManager.GetRolesAsync(user);
-        var selectedRoles = model.Roles.Where(r => r.Selected).Select(r => r.RoleName).ToList();
-
         var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
         if (!removeResult.Succeeded)
         {
-            ModelState.AddModelError(string.Empty, "Failed to remove previous roles.");
-            return View(model);
+            TempData["ErrorMessage"] = "Failed to update user roles.";
+            return RedirectToAction(nameof(Index));
         }
 
-        var addResult = await _userManager.AddToRolesAsync(user, selectedRoles);
-        if (!addResult.Succeeded)
+        if (selectedRoles.Any())
         {
-            ModelState.AddModelError(string.Empty, "Failed to add selected roles.");
-            return View(model);
+            var addResult = await _userManager.AddToRolesAsync(user, selectedRoles);
+            if (!addResult.Succeeded)
+            {
+                TempData["ErrorMessage"] = "Failed to assign selected roles.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         TempData["SuccessMessage"] = $"Roles updated successfully for {user.Email}.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateRole(CreateRoleViewModel model)
+    {
+        if (string.IsNullOrWhiteSpace(model.RoleName))
+        {
+            TempData["ErrorMessage"] = "Role name cannot be empty.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var roleName = model.RoleName.Trim();
+        if (await _roleManager.RoleExistsAsync(roleName))
+        {
+            TempData["ErrorMessage"] = $"Role '{roleName}' already exists.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+        if (result.Succeeded)
+        {
+            TempData["SuccessMessage"] = $"Role '{roleName}' created successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        var currentUserId = _userManager.GetUserId(User);
+        if (currentUserId == id)
+        {
+            TempData["ErrorMessage"] = "You cannot delete your own account.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            TempData["ErrorMessage"] = "User not found.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var result = await _userManager.DeleteAsync(user);
+        if (result.Succeeded)
+        {
+            TempData["SuccessMessage"] = $"User {user.Email} deleted successfully.";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = string.Join("; ", result.Errors.Select(e => e.Description));
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult ManageRoles(string? id)
+    {
         return RedirectToAction(nameof(Index));
     }
 }

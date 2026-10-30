@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class ReportController : Controller
 {
     private readonly IReportService _reportService;

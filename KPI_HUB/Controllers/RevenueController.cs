@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class RevenueController : Controller
 {
     private readonly IRevenueService _revenueService;
@@ -24,6 +24,7 @@ public class RevenueController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Customers = await _customerService.GetCustomersAsync();
@@ -31,6 +32,7 @@ public class RevenueController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateRevenueViewModel model)
     {
@@ -46,6 +48,7 @@ public class RevenueController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _revenueService.GetRevenueForEditAsync(id);
@@ -56,6 +59,7 @@ public class RevenueController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EditRevenueViewModel model)
     {
@@ -71,6 +75,7 @@ public class RevenueController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class ProductController : Controller
 {
     private readonly IProductService _productService;
@@ -22,12 +22,14 @@ public class ProductController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public IActionResult Create()
     {
         return View(new ProductFormViewModel { Status = "Active" });
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ProductFormViewModel model)
     {
@@ -39,6 +41,7 @@ public class ProductController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Edit(int id)
     {
         var model = await _productService.GetProductForEditAsync(id);
@@ -48,6 +51,7 @@ public class ProductController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ProductFormViewModel model)
     {
@@ -59,6 +63,7 @@ public class ProductController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {

@@ -9,11 +9,14 @@
         <h4 class="fw-bold mb-1">Direct Revenue Streams</h4>
         <p class="text-muted mb-0">Record and track subscriptions, consulting fees, contracts, and other business inflows</p>
     </div>
-    <div class="d-flex gap-2">
-        <a asp-action="Create" class="btn btn-primary btn-sm">
-            <i class="bi bi-plus-circle me-1"></i> Add Revenue Entry
-        </a>
-    </div>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <div class="d-flex gap-2">
+            <a asp-action="Create" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> Add Revenue Entry
+            </a>
+        </div>
+    }
 </div>
 
 <div class="row g-3 mb-4">
@@ -54,14 +57,21 @@
                             <td class="fw-bold text-success fs-6">₹@rev.Amount.ToString("N2")</td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a asp-action="Edit" asp-route-id="@rev.Id" class="btn btn-outline-secondary" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@rev.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this revenue entry?');">
-                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@rev.Id" class="btn btn-outline-secondary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@rev.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this revenue entry?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Read-Only</span>
+                                    }
                                 </div>
                             </td>
                         </tr>

@@ -58,7 +58,7 @@
                 <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Report" ? "active" : "")" asp-controller="Report" asp-action="Index">
                     <i class="bi bi-file-earmark-bar-graph"></i> Financial Reports & P&L
                 </a>
-                @if (User.IsInRole("Admin") || User.IsInRole("Founder"))
+                @if (User.IsInRole("Admin"))
                 {
                     <a class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Admin" ? "active" : "")" asp-controller="Admin" asp-action="Index">
                         <i class="bi bi-shield-lock"></i> Administration

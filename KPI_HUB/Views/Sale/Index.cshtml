@@ -8,9 +8,12 @@
         <h4 class="fw-bold mb-1">Sales & Customer Orders</h4>
         <p class="text-muted mb-0">Record and track multi-item sales transactions and invoices</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary btn-sm">
-        <i class="bi bi-cart-plus me-1"></i> Record New Sale
-    </a>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-cart-plus me-1"></i> Record New Sale
+        </a>
+    }
 </div>
 
 <div class="panel-card shadow-sm border-0">
@@ -50,11 +53,14 @@
                                     <a asp-action="Details" asp-route-id="@sale.Id" class="btn btn-outline-primary" title="View Invoice">
                                         <i class="bi bi-receipt me-1"></i> Invoice
                                     </a>
-                                    <form asp-action="Delete" asp-route-id="@sale.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel and delete this sale? Stock will be restored.');">
-                                        <button type="submit" class="btn btn-outline-danger" title="Cancel Sale">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <form asp-action="Delete" asp-route-id="@sale.Id" method="post" class="d-inline" onsubmit="return confirm('Cancel and delete this sale? Stock will be restored.');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Cancel Sale">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
                                 </div>
                             </td>
                         </tr>

@@ -10,7 +10,7 @@
                 <div class="brand-mark mx-auto mb-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
-                <h4 class="fw-bold">Create Founder Account</h4>
+                <h4 class="fw-bold">Create Account</h4>
                 <p class="text-muted small">Start tracking startup finance, revenue, and KPIs</p>
             </div>
 
@@ -38,10 +38,9 @@
                 <div class="mb-3">
                     <label asp-for="Role" class="form-label small fw-bold text-muted">INITIAL ROLE</label>
                     <select asp-for="Role" class="form-select">
-                        <option value="Founder">Founder</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Accountant">Accountant</option>
                         <option value="Admin">Admin</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Viewer">Viewer</option>
                     </select>
                     <span asp-validation-for="Role" class="text-danger small"></span>
                 </div>

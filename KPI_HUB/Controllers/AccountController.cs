@@ -86,8 +86,8 @@ public class AccountController : Controller
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
         {
-            // Assign role (Founder by default or chosen role)
-            var roleToAssign = string.IsNullOrWhiteSpace(model.Role) ? "Founder" : model.Role;
+            // Assign role (Viewer by default or chosen role)
+            var roleToAssign = string.IsNullOrWhiteSpace(model.Role) ? "Viewer" : model.Role;
             if (await _roleManager.RoleExistsAsync(roleToAssign))
             {
                 await _userManager.AddToRoleAsync(user, roleToAssign);

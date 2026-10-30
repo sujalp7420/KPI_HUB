@@ -13,9 +13,12 @@
         <h4 class="fw-bold mb-1">Marketing Campaigns & Unit Economics</h4>
         <p class="text-muted mb-0">Track platform spends, Customer Acquisition Cost (CAC), and Marketing Return on Investment (ROI)</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary btn-sm">
-        <i class="bi bi-megaphone me-1"></i> New Campaign
-    </a>
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <a asp-action="Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-megaphone me-1"></i> New Campaign
+        </a>
+    }
 </div>
 
 <!-- Marketing KPI Summary Row -->
@@ -104,14 +107,21 @@
                             </td>
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
-                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-outline-secondary" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this marketing campaign?');">
-                                        <button type="submit" class="btn btn-outline-danger" title="Delete">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-outline-secondary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this marketing campaign?');">
+                                            <button type="submit" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">Read-Only</span>
+                                    }
                                 </div>
                             </td>
                         </tr>

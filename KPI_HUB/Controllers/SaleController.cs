@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KPI_HUB.Controllers;
 
-[Authorize]
+[Authorize(Roles = "Admin,Manager,Viewer")]
 public class SaleController : Controller
 {
     private readonly ISaleService _saleService;
@@ -37,6 +37,7 @@ public class SaleController : Controller
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Create()
     {
         ViewBag.Customers = await _customerService.GetCustomersAsync();
@@ -45,6 +46,7 @@ public class SaleController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateSaleViewModel model)
     {
@@ -66,6 +68,7 @@ public class SaleController : Controller
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,Manager")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id)
     {
